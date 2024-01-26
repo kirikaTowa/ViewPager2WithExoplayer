@@ -1,7 +1,7 @@
 package com.example.viewpager2withexoplayer
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.example.viewpager2withexoplayer.databinding.ActivityMainBinding
 
@@ -65,23 +65,23 @@ class MainActivity : AppCompatActivity() {
                 exoPlayerItems.add(exoPlayerItem)
             }
         })
-        adapter.submitList( videos)
+        adapter.submitList(videos)
 
         binding.viewPager2.adapter = adapter
 
         binding.viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                val previousIndex = exoPlayerItems.indexOfFirst { it.exoPlayer.isPlaying }
+                val previousIndex = exoPlayerItems.indexOfFirst { it.exoPlayer?.isPlaying ?: false }
                 if (previousIndex != -1) {
                     val player = exoPlayerItems[previousIndex].exoPlayer
-                    player.pause()
-                    player.playWhenReady = false
+                    player?.pause()
+                    player?.playWhenReady = false
                 }
                 val newIndex = exoPlayerItems.indexOfFirst { it.position == position }
                 if (newIndex != -1) {
                     val player = exoPlayerItems[newIndex].exoPlayer
-                    player.playWhenReady = true
-                    player.play()
+                    player?.playWhenReady = true
+                    player?.play()
                 }
             }
         })
@@ -93,8 +93,8 @@ class MainActivity : AppCompatActivity() {
         val index = exoPlayerItems.indexOfFirst { it.position == binding.viewPager2.currentItem }
         if (index != -1) {
             val player = exoPlayerItems[index].exoPlayer
-            player.pause()
-            player.playWhenReady = false
+            player?.pause()
+            player?.playWhenReady = false
         }
     }
 
@@ -104,8 +104,8 @@ class MainActivity : AppCompatActivity() {
         val index = exoPlayerItems.indexOfFirst { it.position == binding.viewPager2.currentItem }
         if (index != -1) {
             val player = exoPlayerItems[index].exoPlayer
-            player.playWhenReady = true
-            player.play()
+            player?.playWhenReady = true
+            player?.play()
         }
     }
 
@@ -114,8 +114,8 @@ class MainActivity : AppCompatActivity() {
         if (exoPlayerItems.isNotEmpty()) {
             for (item in exoPlayerItems) {
                 val player = item.exoPlayer
-                player.stop()
-                player.clearMediaItems()
+                player?.stop()
+                player?.clearMediaItems()
             }
         }
     }
