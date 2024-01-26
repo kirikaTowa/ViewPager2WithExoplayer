@@ -60,11 +60,12 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        adapter = VideoAdapter(this, videos, object : VideoAdapter.OnVideoPreparedListener {
+        adapter = VideoAdapter(this, object : VideoAdapter.OnVideoPreparedListener {
             override fun onVideoPrepared(exoPlayerItem: ExoPlayerItem) {
                 exoPlayerItems.add(exoPlayerItem)
             }
         })
+        adapter.submitList( videos)
 
         binding.viewPager2.adapter = adapter
 
