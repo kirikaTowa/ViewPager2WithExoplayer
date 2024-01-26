@@ -21,21 +21,42 @@ class MainActivity : AppCompatActivity() {
         videos.add(
             Video(
                 "Big Buck Bunny",
-                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                "https://v3.cdnpk.net/videvo_files/video/free/2019-11/large_preview/190301_1_25_11.mp4"
             )
         )
 
         videos.add(
             Video(
                 "Elephant Dream",
-                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+                "https://v3.cdnpk.net/videvo_files/video/free/2022-03/large_preview/220113_04_Dog_4k_020.mp4"
             )
         )
 
         videos.add(
             Video(
                 "For Bigger Blazes",
-                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                "https://v1.cdnpk.net/videvo_files/video/premium/getty_204/large_watermarked/istock-473100605_preview.mp4"
+            )
+        )
+
+        videos.add(
+            Video(
+                "For Bigger Blazes",
+                "https://v2.cdnpk.net/videvo_files/video/premium/partners0841/large_watermarked/BB_360f1182-59bf-4749-a51f-48173c4bfbf6_preview.mp4"
+            )
+        )
+
+        videos.add(
+            Video(
+                "For Bigger Blazes",
+                "https://v3.cdnpk.net/videvo_files/video/premium/partners0155/large_watermarked/BB_1240c534-71be-4e23-aac1-6a04df2a7f35_preview.mp4"
+            )
+        )
+
+        videos.add(
+            Video(
+                "For Bigger Blazes",
+                "https://v6.cdnpk.net/videvo_files/video/excite/premium/partners0055/large_watermarked/BB_cefa02cc-335d-4511-b13f-c6d2c45c6b63_preview.mp4"
             )
         )
 

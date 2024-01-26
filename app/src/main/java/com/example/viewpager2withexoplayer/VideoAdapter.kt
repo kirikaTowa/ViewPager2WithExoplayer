@@ -1,5 +1,6 @@
 package com.example.viewpager2withexoplayer
 
+import android.R
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
@@ -12,9 +13,11 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
+
 
 class VideoAdapter(
     var context: Context,
@@ -81,6 +84,8 @@ class VideoAdapter(
         holder.binding.tvTitle.text = model.title
         holder.setVideoPath(model.url)
     }
+
+
 
     override fun getItemCount(): Int {
         return videos.size
