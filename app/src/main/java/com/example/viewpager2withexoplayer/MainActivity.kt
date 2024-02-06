@@ -1,6 +1,7 @@
 package com.example.viewpager2withexoplayer
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,9 +19,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        initView()
+        initData()
+        initListener()
+    }
+
+
+    private fun initView() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+    }
 
+    private fun initData() {
         videos.add(
             Video(
                 "Big Buck Bunny0",
@@ -62,14 +73,11 @@ class MainActivity : AppCompatActivity() {
                 "https://v6.cdnpk.net/videvo_files/video/excite/premium/partners0055/large_watermarked/BB_cefa02cc-335d-4511-b13f-c6d2c45c6b63_preview.mp4"
             )
         )
+    }
 
+    private fun initListener() {
         videoAdapter = VideoAdapter(this, object : VideoAdapter.OnVideoPreparedListener {
             override fun onVideoPrepared(exoPlayerItem: ExoPlayerItem) {
-                /*val item=VideoPlayerManager.exoplayerList.find { it.dexVideo == exoPlayerItem.dexVideo }
-                if (item!=null){
-                    exoPlayerItems.remove(item)
-                }
-                exoPlayerItems.add(exoPlayerItem)*/
             }
         })
         videoAdapter.submitList(videos)
@@ -78,58 +86,70 @@ class MainActivity : AppCompatActivity() {
 
         binding.viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                val targetIndex =
-                    VideoPlayerManager.exoplayerList.indexOfFirst { it.dexVideo == position }
-                if (targetIndex != -1) {
-                    val player = VideoPlayerManager.exoplayerList[targetIndex].exoPlayer
-                    player?.playWhenReady = true
-                    player?.play()
+                if (VideoPlayerManager.isExistPlayer(position)) {
+//                    Log.d("yeTest", "已加载直接播: "+VideoPlayerManager.isExistPlayer(position))
+                    getHolderByPos(position)?.setPlayer()
                 } else {
-                    val recyclerView = binding.viewPager2.getChildAt(0) as RecyclerView
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    val view = layoutManager.findViewByPosition(position)
-
-                    (view?.tag as? VideoAdapter.VideoViewHolder)?.setVideoPath(
-                        videos[position].url,
-                        position
-                    )
+//                    Log.d("yeTest", "未加载初始化配置: "+position)
+                    getHolderByPos(position)?.setVideoPath(videos[position].url)
                 }
+
+                //处理预加载
+                proLoad(position - 1)
+                proLoad(position + 1)
             }
         })
     }
 
+    private fun getHolderByPos(position: Int): VideoAdapter.VideoViewHolder? {
+        val recyclerView = binding.viewPager2.getChildAt(0) as RecyclerView
+        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+        val view = layoutManager.findViewByPosition(position)
+        return view?.tag as? VideoAdapter.VideoViewHolder
+    }
+
+    private fun proLoad(position: Int) {
+        if (position > 0 && position < videos.size && !VideoPlayerManager.isExistPlayer(position)) {
+            Log.d("yeTest", "预加载 位置: " + position)
+            val exoPlayer =
+                VideoPlayerManager.getPlayerInstance(this@MainActivity, position)
+            VideoPlayerManager.configPlayer(
+                this@MainActivity,
+                exoPlayer,
+                videos[position].url
+            )
+
+        }
+    }
+
+
     override fun onPause() {
         super.onPause()
-
-        val index =
-            VideoPlayerManager.exoplayerList.indexOfFirst { it.dexVideo == binding.viewPager2.currentItem }
-        if (index != -1) {
-            val player = VideoPlayerManager.exoplayerList[index].exoPlayer
-            player?.pause()
-            player?.playWhenReady = false
+        val player = VideoPlayerManager.getExistPlayer(binding.viewPager2.currentItem)
+        player?.let {
+            player.pause()
+            player.playWhenReady = false
         }
     }
 
     override fun onResume() {
         super.onResume()
-
-        val index =
-            VideoPlayerManager.exoplayerList.indexOfFirst { it.dexVideo == binding.viewPager2.currentItem }
-        if (index != -1) {
-            val player = VideoPlayerManager.exoplayerList[index].exoPlayer
-            player?.playWhenReady = true
-            player?.play()
+        val player = VideoPlayerManager.getExistPlayer(binding.viewPager2.currentItem)
+        player?.let {
+            player.play()
+            player.playWhenReady = true
         }
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (VideoPlayerManager.exoplayerList.isNotEmpty()) {
-            for (item in VideoPlayerManager.exoplayerList) {
-                val player = item.exoPlayer
-                player?.stop()
-                player?.clearMediaItems()
-            }
-        }
+//        if (VideoPlayerManager.exoplayerList.isNotEmpty()) {
+//            for (item in VideoPlayerManager.exoplayerList) {
+//                val player = item.exoPlayer
+//                player?.stop()
+//                player?.clearMediaItems()
+//            }
+//        }
     }
 }
