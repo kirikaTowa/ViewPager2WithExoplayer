@@ -33,7 +33,6 @@ class VideoAdapter(
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         val model = getItem(position)
         holder.binding.tvTitle.text = model.title
-        holder.setVideoPath(model.url,position)
     }
 
     class VideoViewHolder(
@@ -41,13 +40,16 @@ class VideoAdapter(
         private val context: Context,
         private val videoPreparedListener: OnVideoPreparedListener
     ) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.root.tag = this
+        }
 
         private lateinit var exoPlayer: ExoPlayer
         private lateinit var mediaSource: MediaSource
 
-        fun setVideoPath(url: String,position: Int) {
+        fun setVideoPath(url: String, position: Int) {
 
-            exoPlayer = VideoPlayerManager.getPlayerInstance(position,context)
+            exoPlayer = VideoPlayerManager.getPlayerInstance(position, context)
             exoPlayer.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
                     super.onPlayerError(error)
@@ -76,13 +78,11 @@ class VideoAdapter(
             exoPlayer.setMediaSource(mediaSource)
             exoPlayer.prepare()
 
-            if (absoluteAdapterPosition == 0) {
-                exoPlayer.playWhenReady = true
-                exoPlayer.play()
-            }
-
+            exoPlayer.playWhenReady = true
+            exoPlayer.play()
             videoPreparedListener.onVideoPrepared(ExoPlayerItem(exoPlayer, absoluteAdapterPosition))
         }
+
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
@@ -90,19 +90,10 @@ class VideoAdapter(
         super.onDetachedFromRecyclerView(recyclerView)
     }
 
-    override fun onViewAttachedToWindow(holder: VideoViewHolder) {
-        super.onViewAttachedToWindow(holder)
-    }
-
     override fun onViewDetachedFromWindow(holder: VideoViewHolder) {
+        VideoPlayerManager.pausePlayer(holder.bindingAdapterPosition)
         super.onViewDetachedFromWindow(holder)
     }
-
-    override fun onViewRecycled(holder: VideoViewHolder) {
-        super.onViewRecycled(holder)
-    }
-
-
 
 
     interface OnVideoPreparedListener {
@@ -117,7 +108,6 @@ class VideoAdapter(
         @SuppressLint("DiffUtilEquals")
         override fun areContentsTheSame(oldItem: Video, newItem: Video): Boolean {
             return oldItem.title == newItem.title && oldItem.url == newItem.url
-
         }
     }
 }

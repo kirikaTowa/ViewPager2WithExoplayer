@@ -2,14 +2,17 @@ package com.example.viewpager2withexoplayer
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.viewpager2withexoplayer.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var adapter: VideoAdapter
+    private lateinit var videoAdapter: VideoAdapter
     private val videos = ArrayList<Video>()
     //private val exoPlayerItems = ArrayList<ExoPlayerItem>()
 
@@ -60,7 +63,7 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        adapter = VideoAdapter(this, object : VideoAdapter.OnVideoPreparedListener {
+        videoAdapter = VideoAdapter(this, object : VideoAdapter.OnVideoPreparedListener {
             override fun onVideoPrepared(exoPlayerItem: ExoPlayerItem) {
                 /*val item=VideoPlayerManager.exoplayerList.find { it.dexVideo == exoPlayerItem.dexVideo }
                 if (item!=null){
@@ -69,23 +72,27 @@ class MainActivity : AppCompatActivity() {
                 exoPlayerItems.add(exoPlayerItem)*/
             }
         })
-        adapter.submitList(videos)
+        videoAdapter.submitList(videos)
 
-        binding.viewPager2.adapter = adapter
+        binding.viewPager2.adapter = videoAdapter
 
         binding.viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                val previousIndex = VideoPlayerManager.exoplayerList.indexOfFirst { it.exoPlayer?.isPlaying ?: false }
-                if (previousIndex != -1) {
-                    val player = VideoPlayerManager.exoplayerList[previousIndex].exoPlayer
-                    player?.pause()
-                    player?.playWhenReady = false
-                }
-                val newIndex = VideoPlayerManager.exoplayerList.indexOfFirst { it.dexVideo == position }
-                if (newIndex != -1) {
-                    val player = VideoPlayerManager.exoplayerList[newIndex].exoPlayer
+                val targetIndex =
+                    VideoPlayerManager.exoplayerList.indexOfFirst { it.dexVideo == position }
+                if (targetIndex != -1) {
+                    val player = VideoPlayerManager.exoplayerList[targetIndex].exoPlayer
                     player?.playWhenReady = true
                     player?.play()
+                } else {
+                    val recyclerView = binding.viewPager2.getChildAt(0) as RecyclerView
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val view = layoutManager.findViewByPosition(position)
+
+                    (view?.tag as? VideoAdapter.VideoViewHolder)?.setVideoPath(
+                        videos[position].url,
+                        position
+                    )
                 }
             }
         })
@@ -94,7 +101,8 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
 
-        val index = VideoPlayerManager.exoplayerList.indexOfFirst { it.dexVideo == binding.viewPager2.currentItem }
+        val index =
+            VideoPlayerManager.exoplayerList.indexOfFirst { it.dexVideo == binding.viewPager2.currentItem }
         if (index != -1) {
             val player = VideoPlayerManager.exoplayerList[index].exoPlayer
             player?.pause()
@@ -105,7 +113,8 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val index = VideoPlayerManager.exoplayerList.indexOfFirst { it.dexVideo == binding.viewPager2.currentItem }
+        val index =
+            VideoPlayerManager.exoplayerList.indexOfFirst { it.dexVideo == binding.viewPager2.currentItem }
         if (index != -1) {
             val player = VideoPlayerManager.exoplayerList[index].exoPlayer
             player?.playWhenReady = true

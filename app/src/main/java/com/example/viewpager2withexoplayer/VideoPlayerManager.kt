@@ -8,7 +8,7 @@ object VideoPlayerManager {
     //找下标有两种方式，直上直下滑的可以去除【0】位；可跳页的去除最远端的；
 
 
-    val maxNum = 6
+    val maxNum = 3
     val exoplayerList = ArrayList<ExoPlayerItem>()
     fun getPlayerInstance(position: Int, context: Context): ExoPlayer {
         return if (getExistPlayer(position) == null) {
@@ -26,7 +26,7 @@ object VideoPlayerManager {
 
     private fun addPlayer(exoPlayer: ExoPlayer, position: Int) {
         exoplayerList.let {
-            if (it.size>= maxNum){
+            if (it.size >= maxNum) {
                 it[0].exoPlayer?.release()
                 it[0].exoPlayer = null
                 it.removeAt(0)
@@ -36,6 +36,14 @@ object VideoPlayerManager {
         }
     }
 
+    fun pausePlayer(dex: Int) {
+        val targetIndex = exoplayerList.indexOfFirst { it.dexVideo == dex }
+        if (targetIndex!=-1) {
+            val player = exoplayerList[targetIndex].exoPlayer
+            player?.pause()
+            player?.playWhenReady = false
+        }
+    }
 
     fun releaseAllPlayer() {
         exoplayerList.forEach {
