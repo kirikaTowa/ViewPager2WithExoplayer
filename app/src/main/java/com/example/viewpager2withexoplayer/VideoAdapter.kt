@@ -3,6 +3,7 @@ package com.example.viewpager2withexoplayer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +32,6 @@ class VideoAdapter(
 
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         val model = getItem(position)
-
         holder.binding.tvTitle.text = model.title
         holder.setVideoPath(model.url,position)
     }
@@ -46,14 +46,8 @@ class VideoAdapter(
         private lateinit var mediaSource: MediaSource
 
         fun setVideoPath(url: String,position: Int) {
-            if (VideoPlayerManager.getExistPlayer(position)==null){
-                //create可以抽一个
-                exoPlayer = ExoPlayer.Builder(context).build()
-                VideoPlayerManager.addPlayer(exoPlayer,position)
-            }else{
-                exoPlayer= VideoPlayerManager.getExistPlayer(position)!!
-            }
 
+            exoPlayer = VideoPlayerManager.getPlayerInstance(position,context)
             exoPlayer.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
                     super.onPlayerError(error)
@@ -99,6 +93,16 @@ class VideoAdapter(
     override fun onViewAttachedToWindow(holder: VideoViewHolder) {
         super.onViewAttachedToWindow(holder)
     }
+
+    override fun onViewDetachedFromWindow(holder: VideoViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+    }
+
+    override fun onViewRecycled(holder: VideoViewHolder) {
+        super.onViewRecycled(holder)
+    }
+
+
 
 
     interface OnVideoPreparedListener {
